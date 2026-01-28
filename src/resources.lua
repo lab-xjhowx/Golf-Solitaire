@@ -42,3 +42,34 @@ end
 function playURSound()
 	playSound(3)
 end
+
+function toggleMusic()
+	if not gMusic then return end
+	if gMusic:isPlaying() then
+		gMusic:pause()
+	else
+		gMusic:play()
+	end
+end
+
+function drawMusicIcon(x,y,size,muted)
+	local s=size
+	love.graphics.setLineWidth(2)
+	love.graphics.rectangle('fill',x,y+s*0.35,s*0.18,s*0.3)
+	love.graphics.polygon('fill',
+		x+s*0.18,y+s*0.25,
+		x+s*0.48,y+s*0.1,
+		x+s*0.48,y+s*0.9,
+		x+s*0.18,y+s*0.75
+	)
+	if muted then
+		love.graphics.setLineWidth(2)
+		love.graphics.line(x+s*0.62,y+s*0.25,x+s*0.92,y+s*0.75)
+		love.graphics.line(x+s*0.92,y+s*0.25,x+s*0.62,y+s*0.75)
+	else
+		love.graphics.setLineWidth(2)
+		love.graphics.arc('line',x+s*0.58,y+s*0.5,s*0.32,-0.6,0.6)
+		love.graphics.arc('line',x+s*0.62,y+s*0.5,s*0.44,-0.6,0.6)
+	end
+	love.graphics.setLineWidth(1)
+end

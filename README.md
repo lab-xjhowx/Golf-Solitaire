@@ -100,6 +100,16 @@ love .
 
 Também é possível arrastar a pasta `golf-master` diretamente para o executável do LÖVE, dependendo do sistema operacional.
 
+### Windows (quando o `love` não está no PATH)
+
+Se o comando `love` não for reconhecido, use o executável direto:
+
+```powershell
+& "C:\Program Files\LOVE\love.exe" .
+```
+
+Se você instalou o LÖVE em outro diretório, ajuste o caminho acima.
+
 ---
 
 ## 🕹️ Controles do Jogo

@@ -9,8 +9,8 @@ function PlayState:enter()
 		GGameContext:setSeedOverride(nil)
 	end
 	gCards=initCards()
-	gameBoard=GameBoard()
 	GGameContext:setCards(gCards)
+	gameBoard=GameBoard()
 	GGameContext:setBoard(gameBoard)
 end
 

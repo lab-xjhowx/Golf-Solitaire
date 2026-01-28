@@ -1,6 +1,6 @@
 math.randomseed(os.time())
 -- push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT,WINDOW_WIDTH, WINDOW_HEIGHT)
-love.window.setMode(VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+love.window.setMode(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, {resizable=true, minwidth=VIRTUAL_WIDTH, minheight=VIRTUAL_HEIGHT})
 -- push:setBorderColor(lovecc.getHex("008800"))
 love.window.setTitle("Golf Solitaire")
 fcursor.setSpeed(5,5)

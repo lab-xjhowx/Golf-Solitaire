@@ -1,16 +1,34 @@
 require 'src/dependencies'
 
+SCALE_X=1
+SCALE_Y=1
+
+local function updateScale(w,h)
+	SCALE_X=w/VIRTUAL_WIDTH
+	SCALE_Y=h/VIRTUAL_HEIGHT
+end
+
+updateScale(love.graphics.getWidth(),love.graphics.getHeight())
+
 function love.update(dt)
-	love.mouse.x,love.mouse.y=love.mouse.getPosition()
+	local mx,my=love.mouse.getPosition()
+	love.mouse.x,love.mouse.y=mx/SCALE_X,my/SCALE_Y
 	gStateMachine:update(dt)
 	if GInput then GInput:clearFrame() end
 	love.keyboard.lastKeyPressed=nil
 	love.mouse.lastClick=nil
 end
 
-function love.draw() gStateMachine:render() end
+function love.draw()
+	love.graphics.push()
+	love.graphics.scale(SCALE_X,SCALE_Y)
+	gStateMachine:render()
+	love.graphics.pop()
+end
 
--- function love.resize(w,h) push:resize(w,h) end
+function love.resize(w,h)
+	updateScale(w,h)
+end
 
 function love.keypressed(key)
 	if key=='escape' then love.event.quit() end
@@ -19,7 +37,8 @@ function love.keypressed(key)
 end
 
 function love.mousepressed(x,y,btn)
-	if GInput then GInput:setMousePressed(x,y,btn) end
+	local vx,vy=x/SCALE_X,y/SCALE_Y
+	if GInput then GInput:setMousePressed(vx,vy,btn) end
 	love.mouse.lastClick=btn
-	gStateMachine:mousePressed(x,y,btn)
+	gStateMachine:mousePressed(vx,vy,btn)
 end

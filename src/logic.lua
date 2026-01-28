@@ -145,7 +145,7 @@ function gameOver(background)
 	end
 	gStateMachine:switch('prompt',{
 		background=background,
-		msg=("Your Score: %d!\n\nDo you want to restart?"):format(score),
+		msg=("Sua pontuação: %d!\n\nDeseja reiniciar?"):format(score),
 		width=400,height=150,
 		onYesClick=function() gStateMachine:switch('play') end,
 		onNoClick=function() gStateMachine:switch('main-menu') end

@@ -8,6 +8,8 @@ function GameBoard:init()
 	self.aiMode=false
 	self.deck=Deck()
 	self.pile={}
+	self.uiFont=love.graphics.newFont("assets/fonts/arial.ttf",16)
+	self.musicButton={x=VIRTUAL_WIDTH-62,y=12,width=44,height=32}
 
 	for i=1,7 do
 		self.pile[i]=Pile(OFFSET_LEFT*i+(i-1)*(CARD_WIDTH+OFFSET_LEFT),OFFSET_GAP_VER+CARD_HEIGHT)
@@ -24,6 +26,13 @@ function GameBoard:update(dt)
 		if GAnimation then GAnimation:update(dt) end
 		local keyPressed=(GInput and GInput:getLastKey()) or love.keyboard.lastKeyPressed
 		local lastClick=(GInput and GInput:getLastClick()) or love.mouse.lastClick
+		local mx,my=love.mouse.x,love.mouse.y
+		self.musicHovered=mx>=self.musicButton.x and mx<=self.musicButton.x+self.musicButton.width and my>=self.musicButton.y and my<=self.musicButton.y+self.musicButton.height
+		if lastClick==1 then
+			if mx>=self.musicButton.x and mx<=self.musicButton.x+self.musicButton.width and my>=self.musicButton.y and my<=self.musicButton.y+self.musicButton.height then
+				toggleMusic()
+			end
+		end
 		if keyPressed=='e' and GGameContext then
 			GGameContext:toggleEndlessMode()
 		elseif keyPressed=='a' then 
@@ -39,6 +48,8 @@ function GameBoard:update(dt)
 					break
 				end
 			end
+		elseif keyPressed=='m' then
+			toggleMusic()
 		end
 		if self.aiMode then fcursor.updateT(self.aiMoves,dt) end
 		self.deck:update(dt)
@@ -81,6 +92,17 @@ function GameBoard:render()
 	end
 
 	if gDragCard then gDragCard:render() end
+	if self.musicHovered then
+		love.graphics.setColor(0.2,0.2,0.2,0.9)
+	else
+		love.graphics.setColor(0.1,0.1,0.1,0.8)
+	end
+	love.graphics.rectangle('fill',self.musicButton.x,self.musicButton.y,self.musicButton.width,self.musicButton.height,10,10)
+	love.graphics.setColor(1,1,1,0.85)
+	love.graphics.rectangle('line',self.musicButton.x,self.musicButton.y,self.musicButton.width,self.musicButton.height,10,10)
+	love.graphics.setColor(1,1,1,1)
+	local muted=not (gMusic and gMusic:isPlaying())
+	drawMusicIcon(self.musicButton.x+8,self.musicButton.y+6,20,muted)
 	lovecc.setColor('black')
 	lovecc.reset()
 end
