@@ -35,103 +35,24 @@ O tabuleiro é exibido em 2D, há interação por mouse e atalhos de teclado par
 
 ### Explicação técnica
 
-- **Componentes principais**
-  - `main.lua`: ponto de entrada do jogo, integra com a API do LÖVE (`love.update`, `love.draw`, `love.keypressed`, `love.mousepressed`).
-  - `src/dependencies.lua`: carrega bibliotecas (`lib/*`), constantes, recursos, lógica e configura a máquina de estados global `gStateMachine`.
-  - Máquina de estados (`src/StateMachine.lua`, `src/State.lua`, `src/states/*.lua`): organiza telas como menu principal, jogo e prompts.
-  - Objetos de jogo (`src/objects/*.lua`): implementação de carta (`Card`), baralho (`Deck`), pilha (`Pile`), descarte (`Waste`), carta em arraste (`DraggingCard`) e tabuleiro (`GameBoard`).
-  - Lógica de regras e IA (`src/logic.lua`): geração do baralho, regras de movimentação, cálculo de score, detecção de fim de jogo, dicas (`getHint`) e decisões automáticas (`makeDecision`, `makeSmartDecision`).
+Para detalhes técnicos da arquitetura interna, consulte:  
+- [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 
-- **Como se conectam**
-  - `main.lua` delega atualização e renderização para `gStateMachine`.
-  - `src/dependencies.lua` cria `gStateMachine` com os estados `main-menu`, `play` e `prompt`, e entra inicialmente em `main-menu`.
-  - O estado `PlayState` instancia o `GameBoard`, que contém `Deck`, `Pile`, `Waste` e controla a interação com as cartas.
-  - A lógica de jogo em `logic.lua` é utilizada pelos objetos e pelo `GameBoard` para validar movimentos, finalizar partidas e fornecer dicas/IA.
-
-- **Fluxo básico de execução**
-  1. LÖVE inicia e executa `main.lua`.
-  2. `main.lua` carrega `src/dependencies.lua`, que por sua vez carrega bibliotecas, recursos, objetos, estados e configura `gStateMachine`.
-  3. O jogo entra no estado de menu principal; ao iniciar uma partida, muda para `PlayState`.
-  4. Em cada frame, `love.update(dt)` chama `gStateMachine:update(dt)`, que atualiza o estado atual (`GameBoard` no caso do jogo).
-  5. `love.draw()` chama `gStateMachine:render()`, que desenha o tabuleiro, cartas e UI.
-  6. Entradas de teclado e mouse são encaminhadas à máquina de estados, que as repassa ao estado ativo (menu, jogo ou prompt).
+Para entender as regras completas da variação de Golf Solitaire usada aqui:  
+- [`docs/REGRAS_DO_JOGO.md`](docs/REGRAS_DO_JOGO.md)
 
 ---
 
-## 🧱 Estrutura do Projeto
+## 🧱 Estrutura do Projeto (Resumo)
 
-### Raiz do repositório
+- `main.lua` – ponto de entrada do LÖVE.
+- `src/` – código-fonte principal (objetos, estados, lógica, recursos).
+- `lib/` – bibliotecas auxiliares em Lua (cores, classes, tabelas, cursor).
+- `assets/` – imagens, fontes e sons.
+- `screenshots/` – capturas de tela do jogo.
 
-- `main.lua`  
-  Ponto de entrada do jogo em LÖVE. Atualiza e desenha o estado atual via `gStateMachine` e encaminha eventos de teclado e mouse.
-
-- `README.md`  
-  Documentação oficial do projeto (este arquivo).
-
-- `README.md automático.md`, `análise consciente de projetos.md`, `kit_profissional_de_analise_de_repositorios.md`  
-  Documentos auxiliares de análise e templates de documentação. Não participam diretamente da execução do jogo.
-
-- `assets/`  
-  Recursos visuais e sonoros do jogo.
-  - `assets/audio/`  
-    Arquivos de som e música (`music.mp3`, `cardSlide*.ogg`, `buzz.wav`, etc.).
-  - `assets/fonts/`  
-    Fontes utilizadas na renderização de textos.
-  - `assets/images/`  
-    Imagens do fundo, sprites de cartas, cursor e demais elementos visuais.
-  - `assets/CREDITS`  
-    Créditos dos recursos utilizados.
-
-- `lib/`  
-  Bibliotecas auxiliares em Lua.
-  - `lib/class.lua`  
-    Implementação simples de sistema de classes.
-  - `lib/autocursor.lua`  
-    Lógica relacionada ao cursor automático.
-  - `lib/itable.lua`  
-    Utilitários para manipulação de tabelas.
-  - `lib/lovecc/`  
-    Utilidades visuais, incluindo `Palette/default.lua` e inicialização (`init.lua`).
-
-- `src/`  
-  Código-fonte principal do jogo.
-  - `src/constants.lua`  
-    Constantes globais do jogo (como dimensões de carta, layout e outros valores fixos).
-  - `src/resources.lua`  
-    Carregamento e organização de imagens, fontes e sons.
-  - `src/util.lua`  
-    Funções utilitárias, incluindo geração de quads/sprites das cartas.
-  - `src/custom.lua`  
-    Funções de desenho e comportamentos gráficos específicos.
-  - `src/logic.lua`  
-    Lógica de regras do Golf Solitaire, validação de movimentos, cálculo de score, detecção de fim de jogo, dicas e IA.
-  - `src/dependencies.lua`  
-    Arquivo responsável por carregar todas as dependências (lib, constantes, recursos, objetos, estados), iniciar a música e configurar `gStateMachine`.
-  - `src/Stack.lua`  
-    Implementação de uma pilha genérica utilizada por estruturas do jogo.
-
-  - `src/objects/`  
-    Implementações orientadas a objeto dos elementos do jogo.
-    - `Card.lua` – representação de uma carta individual (naipe, valor, posição e renderização).
-    - `Deck.lua` – baralho de compra.
-    - `Pile.lua` – pilhas de cartas do tableau.
-    - `Waste.lua` – pilha de descarte, central para as regras de Golf.
-    - `DraggingCard.lua` – representação da carta que está sendo arrastada via mouse.
-    - `GameBoard.lua` – composição de deck, piles, waste, gerenciamento de atualização e desenho do tabuleiro.
-
-  - `src/states/`  
-    Sistema de estados do jogo.
-    - `State.lua` – classe base de um estado.
-    - `StateMachine.lua` – máquina de estados responsável por troca e delegação.
-    - `MainMenuState.lua` – estado de menu principal.
-    - `PlayState.lua` – estado onde o jogo acontece; cria `gCards` e `GameBoard` ao entrar.
-    - `states/PromptState/`  
-      - `main.lua`, `util.lua`, `custom.lua` – lógica e componentes para prompts (por exemplo, mensagens de “fim de jogo / deseja reiniciar?”).
-
-- `screenshots/`  
-  Imagens de tela do jogo usadas para documentação e visualização rápida.
-
-Atualmente o projeto não possui pastas dedicadas a `backend/`, `frontend/` web ou `infra/` separada.
+Para uma explicação detalhada da organização interna e das bibliotecas usadas, veja:  
+- [`NOTAS_PTBR.md`](NOTAS_PTBR.md)
 
 ---
 
@@ -192,15 +113,15 @@ Também é possível arrastar a pasta `golf-master` diretamente para o executáv
 ---
 
 ## 🔄 Fluxo Principal da Aplicação
+Resumo rápido:
 
 - A aplicação inicia em `main.lua`, que carrega `src/dependencies.lua`.
-- `src/dependencies.lua` carrega bibliotecas, constantes, recursos, objetos e estados, inicia a música de fundo e configura `gStateMachine`.
-- O estado inicial é o menu principal (`MainMenuState`). Ao iniciar uma partida, o jogo troca para `PlayState`.
-- `PlayState` inicializa o baralho (`gCards = initCards()`) e cria o `GameBoard`, que passa a controlar deck, piles e waste.
-- Em cada frame, `love.update(dt)` chama `gStateMachine:update(dt)` e `love.draw()` chama `gStateMachine:render()`.
-- Eventos de teclado e mouse são tratados em `main.lua` e encaminhados para o estado atual, que decide como reagir (seleção de cartas, arraste, prompts, etc.).
+- A máquina de estados (`gStateMachine`) controla qual tela está ativa (menu, jogo, prompt).
+- O `PlayState` cria o `GameBoard`, que gerencia deck, piles e waste.
+- Toda a lógica de jogadas, score, fim de jogo, dicas e IA está concentrada em `src/logic.lua` e nos objetos em `src/objects/`.
 
-As regras de negócio (validação de jogadas, score, fim de jogo, dicas e IA) estão concentradas em `src/logic.lua` e nos objetos em `src/objects/`.
+Detalhes completos de arquitetura:  
+- [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 
 ---
 
