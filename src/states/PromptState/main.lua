@@ -28,7 +28,8 @@ function PromptState:update(dt)
 end
 
 function PromptState:render()
-	gameBoard:render()
+	local board=GGameContext:getBoard() or gameBoard
+	if board then board:render() end
 	self:renderWindow()
 	self:renderX()
 	self:renderButtons()

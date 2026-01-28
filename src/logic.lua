@@ -11,13 +11,33 @@ function initCards()
 	return cards
 end
 
+function initSeed(seed)
+	if seed == nil then
+		seed = os.time()
+	end
+	math.randomseed(seed)
+	if GGameContext then
+		GGameContext:setSeed(seed)
+	end
+	return seed
+end
+
+local function getCardsRef()
+	return (GGameContext and GGameContext:getCards()) or gCards
+end
+
+local function getBoardRef()
+	return (GGameContext and GGameContext:getBoard()) or gameBoard
+end
+
 function getRandomCard()
-	local s=math.random(#gCards)
-    local v=math.random(#gCards[s])
-	local card=gCards[s][v]
-	table.remove(gCards[s],v)
-	if #gCards[s]==0 then
-		table.remove(gCards,s)
+	local cards=getCardsRef()
+	local s=math.random(#cards)
+    local v=math.random(#cards[s])
+	local card=cards[s][v]
+	table.remove(cards[s],v)
+	if #cards[s]==0 then
+		table.remove(cards,s)
 	end
     return card
 end
@@ -108,18 +128,20 @@ function lockToRegion(card,region)
 	end
 end
 
-function checkLockWaste(card,waste)
-	-- verifica se você pode adicionar a carta ao descarte (waste)
-	return waste.top and (waste.top.value==(card.value+1>13 and 1 or card.value+1) or waste.top.value==(card.value-1<1 and 13 or card.value-1))
-	-- se o waste estiver vazio, não é possível — só pode se o valor for adjacente ao da carta (variação de Golf)
-end
-
 function gameOver(background)
-	local score=35
-	for i=1,#gameBoard.pile do
-		for j=1,#gameBoard.pile[i].cards do
-			score=score-1
+	local board=getBoardRef()
+	local remaining=0
+	for i=1,#board.pile do
+		for j=1,#board.pile[i].cards do
+			remaining=remaining+1
 		end
+	end
+	GScoreSystem:setRemainingCards(remaining)
+	local score=GScoreSystem:getScore()
+	GScoreSystem:addRanking(score)
+	if GGameContext and GGameContext:isEndlessMode() then
+		gStateMachine:switch('play')
+		return
 	end
 	gStateMachine:switch('prompt',{
 		background=background,
@@ -130,22 +152,15 @@ function gameOver(background)
 	})
 end
 
-function isGameOver()
-	if #gameBoard.deck.cards>0 then return false end
-	for i=1,7 do
-		if gameBoard.pile.top and checkLockWaste(gameBoard.pile.top,gameBoard.waste) then
-			return false
-		end
-	end
-	return true
-end
+ 
 gMoves={}
 notg=0
 
 function getHint()
-	for _,pile in ipairs(gameBoard.pile) do
-		if checkLockWaste(pile.top,gameBoard.waste) then
-			return("Mova o "..getCardInfo(pile.top).." para o "..getCardInfo(gameBoard.waste.top))
+	local board=getBoardRef()
+	for _,pile in ipairs(board.pile) do
+		if GRules:checkLockWaste(pile.top,board.waste) then
+			return("Mova o "..getCardInfo(pile.top).." para o "..getCardInfo(board.waste.top))
 		end
 	end
 	return "Compre outra carta"

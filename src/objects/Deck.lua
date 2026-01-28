@@ -15,16 +15,27 @@ end
 function Deck:update(dt)
 	deckTimer=deckTimer+dt	
 	if deckTimer>0.2 and (regionClicked(self) or self.aiClicked)  then
+		local board=GGameContext:getBoard() or gameBoard
 		self.aiClicked=nil
 		deckTimer=0
 		if self.top then
 			playCardSlideSound()
-			self.top:move(gameBoard.waste)
-			gameBoard.waste:pushFlip(self.top)
-			table.insert(gameBoard.waste.undodata,self)
+			if GAnimation then
+				GAnimation:animateCard(self.top, board.waste.x, board.waste.y, self.top.animDuration)
+			else
+				self.top.animating=true
+				self.top.animTime=0
+				self.top.animStartX,self.top.animStartY=self.top.x,self.top.y
+				self.top.animEndX,self.top.animEndY=board.waste.x,board.waste.y
+			end
+			-- ainda assim movemos logicamente a carta para o waste (posição será sobrescrita pela animação)
+			self.top:move(board.waste)
+			board.waste:pushFlip(self.top)
+			table.insert(board.waste.undodata,self)
+			GScoreSystem:recordMove('deck')
 			self:pop()
 		else
-			gameOver(gameBoard)
+			gameOver(board)
 		end
 	end
 end
@@ -36,10 +47,11 @@ function Deck:render()
 end
 
 function Deck:reStock()
-	for i=#gameBoard.stock.cards,1,-1 do
-		gameBoard.stock.cards[i]:move(self)
-		self:pushFlip(gameBoard.stock.cards[i])
-		gameBoard.waste:pop()
+	local board=GGameContext:getBoard() or gameBoard
+	for i=#board.stock.cards,1,-1 do
+		board.stock.cards[i]:move(self)
+		self:pushFlip(board.stock.cards[i])
+		board.waste:pop()
 	end
 end
 

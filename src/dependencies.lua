@@ -20,6 +20,13 @@ require 'src.custom'
 -- importa as funções de lógica especial para abstrair ao máximo
 require 'src.logic'
 
+-- systems
+require 'src.systems.ScoreSystem'
+require 'src.systems.RuleSystem'
+require 'src.systems.InputSystem'
+require 'src.systems.AnimationSystem'
+require 'src.GameContext'
+
 -- protótipo de pilha (Stack)
 require 'src.Stack'
 

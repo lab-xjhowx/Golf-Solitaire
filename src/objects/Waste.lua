@@ -56,6 +56,7 @@ function Waste:urdo()
 
 				table.insert(self.redodata,self.undodata[#self.undodata])
 				table.remove(self.undodata)
+				GScoreSystem:undoMove()
 
 				--this is why i say programmers need to avoid over-genericisation
 				--in the pop function the self's x and y are changed so ... bla bla .. you know (try removing this)
@@ -75,6 +76,7 @@ function Waste:urdo()
 
 				table.insert(self.undodata,self.redodata[#self.redodata])
 				table.remove(self.redodata)
+				GScoreSystem:redoMove()
 
 				if #self.redodata==0 then self:resetPosition() end
 			end

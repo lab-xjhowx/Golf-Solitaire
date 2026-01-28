@@ -164,7 +164,16 @@ Atualmente o projeto não possui arquivo de licença (`LICENSE`), o que limita o
 
 ---
 
-## 👥 Público-Alvo
+## � Documentos Complementares
+
+- [`NOTAS_PTBR.md`](NOTAS_PTBR.md) – notas em português sobre bibliotecas e estrutura interna.
+- [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) – detalhes técnicos da arquitetura do jogo.
+- [`docs/REGRAS_DO_JOGO.md`](docs/REGRAS_DO_JOGO.md) – regras completas da variação de Golf implementada.
+- [`auditoria_tecnica_golf_solitaire_love_2_d.md`](auditoria_tecnica_golf_solitaire_love_2_d.md) – auditoria técnica e propostas de evolução do projeto.
+
+---
+
+## �👥 Público-Alvo
 
 - Desenvolvedores que desejam aprender:
   - LÖVE (Love2D) e jogos 2D em Lua.

@@ -2,6 +2,7 @@ DraggingCard=Class{__includes=Card}
 local locked
 
 function DraggingCard:update(dt)
+	local board=GGameContext:getBoard() or gameBoard
 	if love.mouse.isDown(1) then
 		self:highlightWaste()
 	else
@@ -10,7 +11,7 @@ function DraggingCard:update(dt)
 			self:moveBack()
 			self.parent:push(self:toCard())
 		else
-			table.insert(gameBoard.waste.undodata,self.parent)
+			table.insert(board.waste.undodata,self.parent)
 		end
 	end
 	dragCard(self)
@@ -35,18 +36,21 @@ end
 
 
 function DraggingCard:highlightWaste()
-	gameBoard.waste.highlighted=self.parent~=gameBoard.waste and cardInRegion(self,gameBoard.waste) and  checkLockWaste(self,gameBoard.waste)
+	local board=GGameContext:getBoard() or gameBoard
+	board.waste.highlighted=self.parent~=board.waste and cardInRegion(self,board.waste) and GRules:checkLockWaste(self,board.waste)
 end
 
 function DraggingCard:lockToWaste()
-	if checkLockWaste(self,gameBoard.waste) then
-		locked=lockToRegion(self,gameBoard.waste)
+	local board=GGameContext:getBoard() or gameBoard
+	if GRules:checkLockWaste(self,board.waste) then
+		locked=lockToRegion(self,board.waste)
 		if locked then
 			playCardPlaceSound()
-			gameBoard.waste:push(self:toCard())
+			board.waste:push(self:toCard())
+			GScoreSystem:recordMove('pile')
 		end
 	end
-	gameBoard.waste.highlighted=false
+	board.waste.highlighted=false
 end
 --
 --
