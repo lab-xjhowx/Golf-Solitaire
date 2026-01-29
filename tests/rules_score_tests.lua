@@ -57,5 +57,7 @@ score:recordMove("pile")
 assertEqual(36, score:getScore(), "score combo")
 score:recordMove("deck")
 assertEqual(35, score:getScore(), "score deck")
+score:recordHint(2)
+assertEqual(33, score:getScore(), "score hint penalty")
 
 print("tests passed")

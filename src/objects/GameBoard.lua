@@ -4,6 +4,26 @@ local dragging=true
 a=love.graphics.newFont(100)
 love.graphics.setFont(a)
 
+local function serializeCards(cards)
+	local list={}
+	for i=1,#cards do
+		local c=cards[i]
+		list[i]={suit=c.suit,value=c.value,x=c.x,y=c.y,back=c.back}
+	end
+	return list
+end
+
+local function restoreCards(list)
+	local cards={}
+	for i=1,#list do
+		local data=list[i]
+		local card=Card(data.suit,data.value,data.x,data.y)
+		card.back=data.back
+		cards[i]=card
+	end
+	return cards
+end
+
 function GameBoard:init()
 	self.aiMode=false
 	self.deck=Deck()
@@ -21,11 +41,55 @@ function GameBoard:init()
 	gDragCard=nil
 end
 
+function GameBoard:snapshot()
+	local piles={}
+	for i=1,7 do
+		local pile=self.pile[i]
+		piles[i]={x=pile.x,y=pile.y,cards=serializeCards(pile.cards)}
+	end
+	return {
+		deck={x=self.deck.x,y=self.deck.y,cards=serializeCards(self.deck.cards)},
+		waste={x=self.waste.x,y=self.waste.y,cards=serializeCards(self.waste.cards)},
+		piles=piles,
+		aiMode=self.aiMode
+	}
+end
+
+function GameBoard:applySnapshot(snapshot)
+	if not snapshot then return end
+	self.aiMode=snapshot.aiMode
+	self.deck.cards=restoreCards(snapshot.deck.cards)
+	self.deck.x,self.deck.y=snapshot.deck.x,snapshot.deck.y
+	self.deck:resetTop()
+	self.waste.cards=restoreCards(snapshot.waste.cards)
+	self.waste.x,self.waste.y=snapshot.waste.x,snapshot.waste.y
+	self.waste:resetTop()
+	self.waste.undodata={}
+	self.waste.redodata={}
+	for i=1,7 do
+		local pileData=snapshot.piles[i]
+		local pile=self.pile[i]
+		pile.cards=restoreCards(pileData.cards)
+		pile:resetTop()
+		pile.x,pile.y=pileData.x,pileData.y
+	end
+	gDragCard=nil
+end
+
 function GameBoard:update(dt)
 	local rules=(GGameContext and GGameContext:getRuleSystem()) or GRules
 	local animation=(GGameContext and GGameContext:getAnimationSystem()) or GAnimation
 	local input=(GGameContext and GGameContext:getInputSystem()) or GInput
 	local score=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
+	if GGameContext and GGameContext:isReplayActive() then
+		local snapshot=GGameContext:updateReplay(dt)
+		if snapshot then
+			self:applySnapshot(snapshot)
+		end
+		if GGameContext:isReplayActive() then
+			return
+		end
+	end
 	if not rules:isGameOver(self) then
 		if animation then animation:update(dt) end
 		local keyPressed=(input and input:getLastKey()) or love.keyboard.lastKeyPressed
@@ -45,13 +109,19 @@ function GameBoard:update(dt)
 			makeDecision(table.copy(self.waste),table.copy(self.deck),table.copy(self.pile),self.aiMoves)
 			-- for i=1,#self.aiMoves do print(self.aiMoves[i].toX,self.aiMoves[i].toY) end
 		elseif keyPressed=='h' then
-			local piles,waste=self.pile,self.waste
-			for i,pile in ipairs(piles) do
-				if #pile.cards>0 and waste.cards[#waste.cards] and ((waste.cards[#waste.cards].value==(pile.cards[#pile.cards].value+1>13 and 1 or pile.cards[#pile.cards].value+1)) or (waste.cards[#waste.cards].value==(pile.cards[#pile.cards].value-1<1 and 13 or pile.cards[#pile.cards].value-1)))  then
-					print('Move '..getCardInfo(pile.cards[#pile.cards])..' to the waste!')
-					break
+			local hint=getHint()
+			if hint then
+				print(hint)
+				local hintCost=1
+				if GGameContext then
+					local config=GGameContext:getConfig()
+					hintCost=config and config.hintCost or hintCost
+					GGameContext:incrementMetric('hints',1)
 				end
+				if score then score:recordHint(hintCost) end
 			end
+		elseif keyPressed=='r' then
+			if GGameContext then GGameContext:startReplay() end
 		elseif keyPressed=='m' then
 			toggleMusic()
 		end
@@ -63,11 +133,13 @@ function GameBoard:update(dt)
 				self.pile[i]:update(dt)
 			else
 				if self.pile[i].top and cardIsHovered(self.pile[i].top) then
+					if GGameContext then GGameContext:pushSnapshot(self:snapshot()) end
 					playCardPlaceSound()
 					self.pile[i].top:move(self.waste)
 					self.waste:push(self.pile[i].top)
 					table.insert(self.waste.undodata,self.pile[i])
 					if score then score:recordMove('pile') end
+					if GGameContext then GGameContext:incrementMetric('moves',1) end
 					self.pile[i]:pop()
 					break
 				end

@@ -144,6 +144,10 @@ function gameOver(background)
 	if scoreSystem then
 		scoreSystem:addRanking(score)
 	end
+	if GGameContext then
+		local metrics=GGameContext:getMetrics()
+		if metrics then metrics.endedAt=os.time() end
+	end
 	if GGameContext and GGameContext:isEndlessMode() then
 		gStateMachine:switch('play')
 		return
@@ -164,12 +168,38 @@ notg=0
 function getHint()
 	local board=getBoardRef()
 	local rules=(GGameContext and GGameContext:getRuleSystem()) or GRules
-	for _,pile in ipairs(board.pile) do
-		if rules:checkLockWaste(pile.top,board.waste) then
-			return("Mova o "..getCardInfo(pile.top).." para o "..getCardInfo(board.waste.top))
+	local bestMove=nil
+	local bestScore=-1
+	for i,pile in ipairs(board.pile) do
+		if pile.top and rules:checkLockWaste(pile.top,board.waste) then
+			local newWaste={ top = { value = pile.top.value } }
+			local followUps=0
+			for j,otherPile in ipairs(board.pile) do
+				if j==i then
+					local nextCard=otherPile.cards[#otherPile.cards-1]
+					if nextCard and rules:checkLockWaste(nextCard,newWaste) then
+						followUps=followUps+1
+					end
+				else
+					if otherPile.top and rules:checkLockWaste(otherPile.top,newWaste) then
+						followUps=followUps+1
+					end
+				end
+			end
+			local score=followUps
+			if score>bestScore then
+				bestScore=score
+				bestMove={ type='pile', index=i, card=pile.top }
+			end
 		end
 	end
-	return "Compre outra carta"
+	if bestMove then
+		return "Mova o "..getCardInfo(bestMove.card).." para a waste"
+	end
+	if #board.deck.cards>0 then
+		return "Compre outra carta"
+	end
+	return "Sem jogadas possíveis"
 end
 
 recursionspace=""

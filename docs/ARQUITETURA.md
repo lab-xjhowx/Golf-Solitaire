@@ -8,6 +8,7 @@ Este documento descreve a arquitetura interna do jogo, para quem quer entender c
 - O fluxo principal é controlado por uma **máquina de estados** (`StateMachine`).
 - A lógica de regras do jogo e IA fica principalmente em `src/logic.lua`.
 - A renderização e interação com o jogador são realizadas pelos objetos em `src/objects/` e pelos estados em `src/states/`.
+- O estado global é centralizado em `GameContext`, que coordena sistemas, métricas e configurações.
 
 ## Fluxo Principal
 
@@ -26,6 +27,7 @@ Este documento descreve a arquitetura interna do jogo, para quem quer entender c
    - Importa todos os objetos (`Card`, `Deck`, `Pile`, `Waste`, `DraggingCard`, `GameBoard`).
    - Importa estados (`State`, `StateMachine`, `MainMenuState`, `PlayState`, `PromptState`).
    - Cria a máquina de estados global `gStateMachine` e entra inicialmente em `main-menu`.
+   - Instancia e injeta `ScoreSystem`, `RuleSystem`, `InputSystem` e `AnimationSystem` no `GameContext`.
 
 3. **Máquina de Estados (`src/State.lua`, `src/StateMachine.lua`)**
    - `State` define a interface base (`enter`, `exit`, `update`, `render`, etc.).
@@ -79,6 +81,46 @@ Este documento descreve a arquitetura interna do jogo, para quem quer entender c
     - Verifica se o jogo acabou (`isGameOver`) e, se sim, chama `gameOver`.
   - No `render`:
     - Desenha o fundo, deck, waste, pilhas e, se existir, a carta sendo arrastada.
+
+## GameContext (Fonte única de verdade)
+
+- **Responsabilidade**
+  - Centraliza acesso a sistemas, configuração do jogo, métricas de partida e estado atual.
+  - Mantém seed de RNG, flags de debug e snapshots para replay.
+
+- **Configurações**
+  - `hintCost`: custo aplicado no score a cada dica.
+  - `replayInterval`: intervalo entre frames de replay.
+  - `maxSnapshots`: limite de snapshots em memória.
+
+- **Métricas**
+  - `moves`, `hints`, `deckDraws`, `startedAt`, `endedAt`.
+
+- **Benefícios**
+  - Testabilidade: reduz dependências globais e facilita mocks em testes.
+  - Previsibilidade: estado consolidado, com controle explícito de mudanças.
+
+## Sistemas
+
+- **RuleSystem**
+  - Regras de movimento e detecção de fim de jogo.
+- **ScoreSystem**
+  - Score por combo, compras do deck e custo de dicas.
+- **InputSystem**
+  - Entrada desacoplada do loop principal.
+- **AnimationSystem**
+  - Animações de cartas com estado explícito.
+
+## Hint e Replay
+
+- **Hint**
+  - Analisa jogadas possíveis e escolhe a melhor com base em follow-ups.
+  - Não altera o estado do jogo.
+  - Aplica custo no score via ScoreSystem.
+
+- **Replay**
+  - Snapshots leves do estado do tabuleiro são armazenados no GameContext.
+  - Replay percorre snapshots em intervalos configuráveis.
 
 ## Lógica de Jogo e IA (`src/logic.lua`)
 

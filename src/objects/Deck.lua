@@ -21,6 +21,7 @@ function Deck:update(dt)
 		self.aiClicked=nil
 		deckTimer=0
 		if self.top then
+			if GGameContext then GGameContext:pushSnapshot(board:snapshot()) end
 			playCardSlideSound()
 			if animation then
 				animation:animateCard(self.top, board.waste.x, board.waste.y, self.top.animDuration)
@@ -35,6 +36,10 @@ function Deck:update(dt)
 			board.waste:pushFlip(self.top)
 			table.insert(board.waste.undodata,self)
 			if score then score:recordMove('deck') end
+			if GGameContext then
+				GGameContext:incrementMetric('deckDraws',1)
+				GGameContext:incrementMetric('moves',1)
+			end
 			self:pop()
 		else
 			gameOver(board)

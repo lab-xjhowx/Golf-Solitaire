@@ -16,6 +16,8 @@ function ScoreSystem:reset()
     self.combo = 0
     self.comboBonus = 0
     self.deckDraws = 0
+    self.hintPenalty = 0
+    self.hintsUsed = 0
     self.history = {}
     self.redoHistory = {}
     self.rankings = self.rankings or {}
@@ -27,7 +29,7 @@ end
 
 function ScoreSystem:getScore()
     local baseScore = self.baseMaxScore - self.remainingCards
-    local total = baseScore + self.comboBonus - self.deckDraws
+    local total = baseScore + self.comboBonus - self.deckDraws - self.hintPenalty
     return math.max(total, 0)
 end
 
@@ -67,6 +69,12 @@ function ScoreSystem:recompute()
             self.deckDraws = self.deckDraws + 1
         end
     end
+end
+
+function ScoreSystem:recordHint(cost)
+    local penalty = cost or 1
+    self.hintPenalty = self.hintPenalty + penalty
+    self.hintsUsed = self.hintsUsed + 1
 end
 
 function ScoreSystem:getRankings()

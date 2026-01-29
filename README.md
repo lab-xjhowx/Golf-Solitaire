@@ -2,6 +2,10 @@
 
 Golf Solitaire em 2D feito com LÖVE (Love2D), com dicas, IA simples para sugerir movimentos e suporte a undo/redo.
 
+## Visão geral
+
+Este projeto implementa Golf Solitaire com foco em arquitetura modular, UX clara e base sólida para evolução. O fluxo é guiado por estados, com sistemas de regras, score, input e animação isolados e coordenados por um GameContext centralizado.
+
 ## Screenshots
 
 ![Screenshot 1](screenshots/1.png)
@@ -23,7 +27,28 @@ Golf Solitaire em 2D feito com LÖVE (Love2D), com dicas, IA simples para sugeri
 - Ctrl + Y — refaz o movimento desfeito
 - M — alterna música
 - E — alterna modo endless
+- R — inicia replay por snapshots
 - Esc — sair do jogo
+
+## Arquitetura
+
+- Core: callbacks do LÖVE e bootstrap em main.lua e dependencies.lua
+- States: menu, jogo e prompt
+- Systems: regras, score, input, animação
+- Entities: Card, Deck, Pile, Waste, DraggingCard
+- UI: telas e elementos de interação
+- Resources: sprites, fontes, áudio
+
+Detalhes técnicos: docs/ARQUITETURA.md
+
+## Estrutura de pastas
+
+- assets/ — imagens, fontes e áudio
+- docs/ — documentação técnica
+- lib/ — bibliotecas auxiliares
+- src/ — lógica do jogo, estados, objetos, sistemas
+- screenshots/ — capturas de tela
+- tests/ — testes de regras e score
 
 ## Tecnologias usadas
 
@@ -47,6 +72,16 @@ No Windows, se o love não estiver no PATH:
 & "C:\Program Files\LOVE\love.exe" .
 ```
 
-## Copyright
+## Roadmap
 
-© 2026 Jonathan (@xjhowx). All rights reserved.
+Veja o arquivo ROADMAP.md para evolução técnica, features e polimento visual.
+
+## Créditos
+
+- Jonathan (@xjhowx)
+- Fontes: Ostrich Sans (The League of Moveable Type)
+- SFX: Casino Audio Pack (Kenney)
+
+## Licença
+
+Sem licença declarada no repositório.

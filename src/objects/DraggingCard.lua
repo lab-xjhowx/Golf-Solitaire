@@ -48,9 +48,11 @@ function DraggingCard:lockToWaste()
 	if rules:checkLockWaste(self,board.waste) then
 		locked=lockToRegion(self,board.waste)
 		if locked then
+			if GGameContext then GGameContext:pushSnapshot(board:snapshot()) end
 			playCardPlaceSound()
 			board.waste:push(self:toCard())
 			if score then score:recordMove('pile') end
+			if GGameContext then GGameContext:incrementMetric('moves',1) end
 		end
 	end
 	board.waste.highlighted=false

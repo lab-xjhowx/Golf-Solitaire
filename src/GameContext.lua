@@ -11,6 +11,26 @@ function GameContext.new()
     self.inputSystem = nil
     self.animationSystem = nil
     self.music = nil
+    self.stateName = nil
+    self.config = {
+        hintCost = 1,
+        replayInterval = 0.4,
+        maxSnapshots = 200
+    }
+    self.debugFlags = {
+        enabled = false
+    }
+    self.metrics = {
+        moves = 0,
+        hints = 0,
+        deckDraws = 0,
+        startedAt = os.time(),
+        endedAt = nil
+    }
+    self.snapshots = {}
+    self.replayIndex = 0
+    self.replayTimer = 0
+    self.replayActive = false
     self.endlessMode = false
     self.seed = nil
     self.seedOverride = nil
@@ -71,6 +91,97 @@ end
 
 function GameContext:getMusic()
     return self.music
+end
+
+function GameContext:setStateName(stateName)
+    self.stateName = stateName
+end
+
+function GameContext:getStateName()
+    return self.stateName
+end
+
+function GameContext:setConfig(config)
+    self.config = config or self.config
+end
+
+function GameContext:getConfig()
+    return self.config
+end
+
+function GameContext:updateConfig(key, value)
+    self.config[key] = value
+end
+
+function GameContext:setDebugFlag(key, value)
+    self.debugFlags[key] = value
+end
+
+function GameContext:getDebugFlag(key)
+    return self.debugFlags[key]
+end
+
+function GameContext:resetMetrics()
+    self.metrics = {
+        moves = 0,
+        hints = 0,
+        deckDraws = 0,
+        startedAt = os.time(),
+        endedAt = nil
+    }
+end
+
+function GameContext:incrementMetric(key, value)
+    self.metrics[key] = (self.metrics[key] or 0) + (value or 1)
+end
+
+function GameContext:getMetrics()
+    return self.metrics
+end
+
+function GameContext:pushSnapshot(snapshot)
+    if not snapshot then return end
+    table.insert(self.snapshots, snapshot)
+    local maxSnapshots = self.config.maxSnapshots or 200
+    while #self.snapshots > maxSnapshots do
+        table.remove(self.snapshots, 1)
+    end
+end
+
+function GameContext:clearSnapshots()
+    self.snapshots = {}
+    self.replayIndex = 0
+    self.replayTimer = 0
+    self.replayActive = false
+end
+
+function GameContext:startReplay()
+    if #self.snapshots == 0 then return end
+    self.replayActive = true
+    self.replayIndex = 1
+    self.replayTimer = 0
+end
+
+function GameContext:stopReplay()
+    self.replayActive = false
+end
+
+function GameContext:isReplayActive()
+    return self.replayActive
+end
+
+function GameContext:updateReplay(dt)
+    if not self.replayActive then return nil end
+    self.replayTimer = self.replayTimer + dt
+    local interval = self.config.replayInterval or 0.4
+    if self.replayTimer < interval then return nil end
+    self.replayTimer = 0
+    local snapshot = self.snapshots[self.replayIndex]
+    self.replayIndex = self.replayIndex + 1
+    if self.replayIndex > #self.snapshots then
+        self.replayActive = false
+    end
+    return snapshot
 end
 
 function GameContext:setEndlessMode(enabled)
