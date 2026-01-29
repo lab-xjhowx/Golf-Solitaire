@@ -30,7 +30,7 @@ StateMachine.switch=StateMachine.change
 local callbacks={
 	'update','render',
 	'keyPressed','keyReleased',
-	'mousePressed','mouseMoved','mouseReleased'
+	'mousePressed','mouseMoved','mouseReleased','wheelMoved'
 }
 
 for i=1,#callbacks do

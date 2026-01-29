@@ -1,7 +1,7 @@
 local members={
 	'update','render',
 	'keyPressed','keyReleased',
-	'mousePressed','mouseMoved','mouseReleased',
+	'mousePressed','mouseMoved','mouseReleased','wheelMoved',
 	'enter','exit'
 }
 

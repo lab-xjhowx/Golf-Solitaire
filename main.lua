@@ -45,3 +45,7 @@ function love.mousepressed(x,y,btn)
 	love.mouse.lastClick=btn
 	gStateMachine:mousePressed(vx,vy,btn)
 end
+
+function love.wheelmoved(x,y)
+	gStateMachine:wheelMoved(x,y)
+end
