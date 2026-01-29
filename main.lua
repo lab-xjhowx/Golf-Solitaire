@@ -14,7 +14,8 @@ function love.update(dt)
 	local mx,my=love.mouse.getPosition()
 	love.mouse.x,love.mouse.y=mx/SCALE_X,my/SCALE_Y
 	gStateMachine:update(dt)
-	if GInput then GInput:clearFrame() end
+	local input=GGameContext and GGameContext:getInputSystem()
+	if input then input:clearFrame() end
 	love.keyboard.lastKeyPressed=nil
 	love.mouse.lastClick=nil
 end
@@ -32,13 +33,15 @@ end
 
 function love.keypressed(key)
 	if key=='escape' then love.event.quit() end
-	if GInput then GInput:setKeyPressed(key) end
+	local input=GGameContext and GGameContext:getInputSystem()
+	if input then input:setKeyPressed(key) end
 	love.keyboard.lastKeyPressed=key	
 end
 
 function love.mousepressed(x,y,btn)
 	local vx,vy=x/SCALE_X,y/SCALE_Y
-	if GInput then GInput:setMousePressed(vx,vy,btn) end
+	local input=GGameContext and GGameContext:getInputSystem()
+	if input then input:setMousePressed(vx,vy,btn) end
 	love.mouse.lastClick=btn
 	gStateMachine:mousePressed(vx,vy,btn)
 end

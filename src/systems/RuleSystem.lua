@@ -26,5 +26,4 @@ function RuleSystem:isGameOver(board)
     end
     return true
 end
-
-GRules = RuleSystem.new()
+return RuleSystem

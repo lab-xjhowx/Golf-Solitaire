@@ -26,5 +26,4 @@ function AnimationSystem:update(dt)
         end
     end
 end
-
-GAnimation = AnimationSystem.new()
+return AnimationSystem

@@ -136,9 +136,14 @@ function gameOver(background)
 			remaining=remaining+1
 		end
 	end
-	GScoreSystem:setRemainingCards(remaining)
-	local score=GScoreSystem:getScore()
-	GScoreSystem:addRanking(score)
+	local scoreSystem=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
+	if scoreSystem then
+		scoreSystem:setRemainingCards(remaining)
+	end
+	local score=scoreSystem and scoreSystem:getScore() or 0
+	if scoreSystem then
+		scoreSystem:addRanking(score)
+	end
 	if GGameContext and GGameContext:isEndlessMode() then
 		gStateMachine:switch('play')
 		return
@@ -158,8 +163,9 @@ notg=0
 
 function getHint()
 	local board=getBoardRef()
+	local rules=(GGameContext and GGameContext:getRuleSystem()) or GRules
 	for _,pile in ipairs(board.pile) do
-		if GRules:checkLockWaste(pile.top,board.waste) then
+		if rules:checkLockWaste(pile.top,board.waste) then
 			return("Mova o "..getCardInfo(pile.top).." para o "..getCardInfo(board.waste.top))
 		end
 	end

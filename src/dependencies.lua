@@ -21,10 +21,10 @@ require 'src.custom'
 require 'src.logic'
 
 -- systems
-require 'src.systems.ScoreSystem'
-require 'src.systems.RuleSystem'
-require 'src.systems.InputSystem'
-require 'src.systems.AnimationSystem'
+local ScoreSystem=require 'src.systems.ScoreSystem'
+local RuleSystem=require 'src.systems.RuleSystem'
+local InputSystem=require 'src.systems.InputSystem'
+local AnimationSystem=require 'src.systems.AnimationSystem'
 require 'src.GameContext'
 
 -- protótipo de pilha (Stack)
@@ -34,10 +34,16 @@ require 'src.Stack'
 -- importa os protótipos dos objetos do jogo
 require 'src.objects.Card'
 require 'src.objects.DraggingCard'
-
-gMusic=love.audio.newSource('assets/audio/music.mp3','stream')
-gMusic:setLooping(true)
-gMusic:play()
+if GGameContext then
+	GGameContext:setScoreSystem(ScoreSystem.new())
+	GGameContext:setRuleSystem(RuleSystem.new())
+	GGameContext:setInputSystem(InputSystem.new())
+	GGameContext:setAnimationSystem(AnimationSystem.new())
+	local music=love.audio.newSource('assets/audio/music.mp3','stream')
+	music:setLooping(true)
+	music:play()
+	GGameContext:setMusic(music)
+end
 require 'src.objects.Waste'
 require 'src.objects.Deck'
 require 'src.objects.Pile'

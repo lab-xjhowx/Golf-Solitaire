@@ -110,6 +110,4 @@ function ScoreSystem:saveRankings()
     end
     love.filesystem.write('rankings.dat', table.concat(lines, '\n'))
 end
-
--- helper global simples para uso no código existente
-GScoreSystem = ScoreSystem.new()
+return ScoreSystem

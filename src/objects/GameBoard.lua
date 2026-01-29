@@ -22,10 +22,14 @@ function GameBoard:init()
 end
 
 function GameBoard:update(dt)
-	if not GRules:isGameOver(self) then
-		if GAnimation then GAnimation:update(dt) end
-		local keyPressed=(GInput and GInput:getLastKey()) or love.keyboard.lastKeyPressed
-		local lastClick=(GInput and GInput:getLastClick()) or love.mouse.lastClick
+	local rules=(GGameContext and GGameContext:getRuleSystem()) or GRules
+	local animation=(GGameContext and GGameContext:getAnimationSystem()) or GAnimation
+	local input=(GGameContext and GGameContext:getInputSystem()) or GInput
+	local score=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
+	if not rules:isGameOver(self) then
+		if animation then animation:update(dt) end
+		local keyPressed=(input and input:getLastKey()) or love.keyboard.lastKeyPressed
+		local lastClick=(input and input:getLastClick()) or love.mouse.lastClick
 		local mx,my=love.mouse.x,love.mouse.y
 		self.musicHovered=mx>=self.musicButton.x and mx<=self.musicButton.x+self.musicButton.width and my>=self.musicButton.y and my<=self.musicButton.y+self.musicButton.height
 		if lastClick==1 then
@@ -63,7 +67,7 @@ function GameBoard:update(dt)
 					self.pile[i].top:move(self.waste)
 					self.waste:push(self.pile[i].top)
 					table.insert(self.waste.undodata,self.pile[i])
-					GScoreSystem:recordMove('pile')
+					if score then score:recordMove('pile') end
 					self.pile[i]:pop()
 					break
 				end
@@ -83,10 +87,11 @@ function GameBoard:render()
 	self.waste:render()
 
 	-- antes de desenhar as pilhas, marca quais cartas do topo são jogáveis
+	local rules=(GGameContext and GGameContext:getRuleSystem()) or GRules
 	for i=1,7 do
 		local pile=self.pile[i]
 		if pile.top then
-			pile.top.highlight = GRules:checkLockWaste(pile.top,self.waste)
+			pile.top.highlight = rules:checkLockWaste(pile.top,self.waste)
 		end
 		pile:render()
 	end
@@ -101,7 +106,8 @@ function GameBoard:render()
 	love.graphics.setColor(1,1,1,0.85)
 	love.graphics.rectangle('line',self.musicButton.x,self.musicButton.y,self.musicButton.width,self.musicButton.height,10,10)
 	love.graphics.setColor(1,1,1,1)
-	local muted=not (gMusic and gMusic:isPlaying())
+	local music=getMusicRef()
+	local muted=not (music and music:isPlaying())
 	drawMusicIcon(self.musicButton.x+8,self.musicButton.y+6,20,muted)
 	lovecc.setColor('black')
 	lovecc.reset()
@@ -112,8 +118,9 @@ function fcursor.drag(x,y) end
 function fcursor.click(x,y,btn)
 	local board=GGameContext:getBoard() or gameBoard
 	if btn==1 then board.deck.aiClicked=true end
-	if GInput then
-		GInput:setMousePressed(x,y,btn)
+	local input=(GGameContext and GGameContext:getInputSystem()) or GInput
+	if input then
+		input:setMousePressed(x,y,btn)
 	else
 		love.mouse.lastClick=btn
 	end

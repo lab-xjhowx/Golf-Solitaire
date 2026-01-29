@@ -43,12 +43,20 @@ function playURSound()
 	playSound(3)
 end
 
+function getMusicRef()
+	if GGameContext and GGameContext:getMusic() then
+		return GGameContext:getMusic()
+	end
+	return gMusic
+end
+
 function toggleMusic()
-	if not gMusic then return end
-	if gMusic:isPlaying() then
-		gMusic:pause()
+	local music=getMusicRef()
+	if not music then return end
+	if music:isPlaying() then
+		music:pause()
 	else
-		gMusic:play()
+		music:play()
 	end
 end
 

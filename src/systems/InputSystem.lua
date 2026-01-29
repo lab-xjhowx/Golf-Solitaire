@@ -29,5 +29,4 @@ function InputSystem:clearFrame()
     self.lastKeyPressed = nil
     self.lastClick = nil
 end
-
-GInput = InputSystem.new()
+return InputSystem

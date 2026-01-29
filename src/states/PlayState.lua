@@ -2,7 +2,8 @@ PlayState=State()
 
 function PlayState:enter()
 	--this cards is going to be global but its shortlived (only use is in init functions) and not constant
-	GScoreSystem:reset()
+	local score=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
+	if score then score:reset() end
 	local seedOverride = GGameContext and GGameContext:getSeedOverride()
 	initSeed(seedOverride)
 	if GGameContext and seedOverride ~= nil then

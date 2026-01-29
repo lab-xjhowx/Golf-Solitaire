@@ -40,6 +40,7 @@ end
 --undo/redo mechanism (urdu)
 function Waste:urdo()
 	if love.keyboard.isDown('lctrl') then
+		local score=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
 		if love.keyboard.isDown('z') then
 			if #self.undodata>0 then
 
@@ -56,7 +57,7 @@ function Waste:urdo()
 
 				table.insert(self.redodata,self.undodata[#self.undodata])
 				table.remove(self.undodata)
-				GScoreSystem:undoMove()
+				if score then score:undoMove() end
 
 				--this is why i say programmers need to avoid over-genericisation
 				--in the pop function the self's x and y are changed so ... bla bla .. you know (try removing this)
@@ -76,7 +77,7 @@ function Waste:urdo()
 
 				table.insert(self.undodata,self.redodata[#self.redodata])
 				table.remove(self.redodata)
-				GScoreSystem:redoMove()
+				if score then score:redoMove() end
 
 				if #self.redodata==0 then self:resetPosition() end
 			end

@@ -16,12 +16,14 @@ function Deck:update(dt)
 	deckTimer=deckTimer+dt	
 	if deckTimer>0.2 and (regionClicked(self) or self.aiClicked)  then
 		local board=GGameContext:getBoard() or gameBoard
+		local animation=(GGameContext and GGameContext:getAnimationSystem()) or GAnimation
+		local score=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
 		self.aiClicked=nil
 		deckTimer=0
 		if self.top then
 			playCardSlideSound()
-			if GAnimation then
-				GAnimation:animateCard(self.top, board.waste.x, board.waste.y, self.top.animDuration)
+			if animation then
+				animation:animateCard(self.top, board.waste.x, board.waste.y, self.top.animDuration)
 			else
 				self.top.animating=true
 				self.top.animTime=0
@@ -32,7 +34,7 @@ function Deck:update(dt)
 			self.top:move(board.waste)
 			board.waste:pushFlip(self.top)
 			table.insert(board.waste.undodata,self)
-			GScoreSystem:recordMove('deck')
+			if score then score:recordMove('deck') end
 			self:pop()
 		else
 			gameOver(board)

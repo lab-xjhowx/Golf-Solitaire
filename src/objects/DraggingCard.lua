@@ -37,17 +37,20 @@ end
 
 function DraggingCard:highlightWaste()
 	local board=GGameContext:getBoard() or gameBoard
-	board.waste.highlighted=self.parent~=board.waste and cardInRegion(self,board.waste) and GRules:checkLockWaste(self,board.waste)
+	local rules=(GGameContext and GGameContext:getRuleSystem()) or GRules
+	board.waste.highlighted=self.parent~=board.waste and cardInRegion(self,board.waste) and rules:checkLockWaste(self,board.waste)
 end
 
 function DraggingCard:lockToWaste()
 	local board=GGameContext:getBoard() or gameBoard
-	if GRules:checkLockWaste(self,board.waste) then
+	local rules=(GGameContext and GGameContext:getRuleSystem()) or GRules
+	local score=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
+	if rules:checkLockWaste(self,board.waste) then
 		locked=lockToRegion(self,board.waste)
 		if locked then
 			playCardPlaceSound()
 			board.waste:push(self:toCard())
-			GScoreSystem:recordMove('pile')
+			if score then score:recordMove('pile') end
 		end
 	end
 	board.waste.highlighted=false
