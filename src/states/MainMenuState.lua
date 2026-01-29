@@ -13,7 +13,7 @@ function MainMenuState:enter()
 	self.boxW=560
 	self.boxH=340
 	self.boxX=(1280-self.boxW)/2
-	self.boxY=220
+	self.boxY=VIRTUAL_HEIGHT*0.22
 	self.headerY=190
 	self.headerH=50
 	self.playButton={x=(1280-260)/2,y=self.boxY+self.boxH-50,width=260,height=40}
