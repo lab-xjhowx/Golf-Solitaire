@@ -1,6 +1,11 @@
 # Golf Solitaire
 
-Golf Solitaire em 2D feito com LÖVE (Love2D), com dicas, IA simples para sugerir movimentos e suporte a undo/redo.
+[![CI](https://github.com/lab-xjhowx/Golf-Solitaire/actions/workflows/ci.yml/badge.svg)](https://github.com/lab-xjhowx/Golf-Solitaire/actions/workflows/ci.yml)
+[![Language](https://img.shields.io/badge/language-lua-blue)](https://www.lua.org/)
+
+Golf Solitaire em 2D feito com LÖVE (Love2D). Inclui undo/redo, hints e IA simples. Compatível com LÖVE 11.x.
+
+2D Golf Solitaire built with LÖVE (Love2D). Includes undo/redo, hints, and a simple move-suggestion AI. Compatible with LÖVE 11.x.
 
 ## Visão geral
 
@@ -68,7 +73,7 @@ Detalhes técnicos: docs/ARQUITETURA.md
 
 ## Como rodar localmente
 
-Pré-requisitos: LÖVE (Love2D) instalado.
+Pré-requisitos: LÖVE (Love2D) 11.x instalado.
 
 ```bash
 git clone <url-do-repositorio>
@@ -80,6 +85,36 @@ No Windows, se o love não estiver no PATH:
 
 ```powershell
 & "C:\Program Files\LOVE\love.exe" .
+```
+
+## Testes
+
+```bash
+lua tests/rules_score_tests.lua
+```
+
+## English
+
+Short overview: Golf Solitaire in LÖVE (Love2D) with undo/redo, hints and a simple AI helper. Compatible with LÖVE 11.x.
+
+Run:
+
+```bash
+git clone <url-do-repositorio>
+cd golf-master
+love .
+```
+
+Windows (if Love2D is not in PATH):
+
+```powershell
+& "C:\Program Files\LOVE\love.exe" .
+```
+
+Tests:
+
+```bash
+lua tests/rules_score_tests.lua
 ```
 
 ## Roadmap

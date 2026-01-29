@@ -11,10 +11,10 @@ function MainMenuState:enter()
 	self.uiFont=love.graphics.newFont("assets/fonts/arial.ttf",16)
 	self.backImage=love.graphics.newImage('assets/images/mainBackground.png')
 	self.boxW=560
-	self.boxH=300
+	self.boxH=340
 	self.boxX=(1280-self.boxW)/2
-	self.boxY=260
-	self.headerY=210
+	self.boxY=240
+	self.headerY=190
 	self.headerH=50
 	self.playButton={x=(1280-260)/2,y=self.boxY+self.boxH-50,width=260,height=40}
 	self.musicButton={x=1280-62,y=18,width=44,height=32}
@@ -104,11 +104,11 @@ function MainMenuState:renderOtherStuff()
 
 	love.graphics.setFont(self.arialFont)
 	love.graphics.setColor(0.95,0.88,0.5,1)
-	drawShadowedText("Objetivos do jogo:",self.boxX,self.headerY+13,self.boxW,'center',1,0.6,1)
+	drawShadowedText("SOBRE O JOGO:",self.boxX,self.headerY+13,self.boxW,'center',1,0.6,1)
 	love.graphics.setFont(self.orbitonFont)
 	love.graphics.setColor(1,1,1,1)
 	local lineHeight=self.orbitonFont:getHeight()*1.25
-	drawWrappedShadowed("O objetivo principal do jogo é mover todas as cartas para a pilha de descarte (waste), usando apenas as cartas disponíveis no tableau. Apenas doses podem ser colocadas sobre ases e nenhuma carta pode ser jogada sobre um rei. As cartas são compradas uma a uma do estoque para a waste. Não há redistribuições. Cada carta movida do tableau para a waste vale um ponto. Tente chegar o mais perto possível de 35 pontos! Você pode desfazer/refazer com Ctrl-Z/Ctrl-Y. Pressione H para dica e A para a IA ajudar nas jogadas.",self.boxX+16,self.boxY+16,self.boxW-32,lineHeight)
+	drawWrappedShadowed("O objetivo principal do jogo é mover todas as cartas para a pilha de descarte (o lixo), utilizando apenas as cartas disponíveis no tableau.\n\nRegras de movimentação:\nApenas Damas podem ser colocadas sobre Ases.\nNenhuma carta pode ser jogada sobre um Rei.\n\nPontuação e fluxo do jogo:\nAs cartas são compradas uma a uma do estoque para a pilha de descarte.\nNão há redistribuições (reinícios do baralho).\nCada carta movida do tableau para a pilha de descarte vale um ponto.\nTente chegar o mais perto possível de 35 pontos!\n\nComandos rápidos:\nVocê pode desfazer/refazer jogadas com Ctrl-Z / Ctrl-Y.\nPressione H para obter uma dica.\nPressione A para que a IA ajude nas jogadas.",self.boxX+16,self.boxY+16,self.boxW-32,lineHeight)
 
 	-- call-to-action visual na parte inferior
 	local ctaX,ctaY,ctaWidth,ctaHeight=self.playButton.x,self.playButton.y,self.playButton.width,self.playButton.height
