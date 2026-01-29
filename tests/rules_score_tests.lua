@@ -6,6 +6,10 @@ end
 
 package.path = package.path .. ";./?.lua;./?/init.lua;./?/?.lua"
 
+Class = require "lib.class"
+require "src.objects.Card"
+require "src.logic"
+
 if not love then love = {} end
 love.filesystem = love.filesystem or {}
 love.filesystem.getInfo = love.filesystem.getInfo or function() return nil end
@@ -59,5 +63,30 @@ score:recordMove("deck")
 assertEqual(35, score:getScore(), "score deck")
 score:recordHint(2)
 assertEqual(33, score:getScore(), "score hint penalty")
+
+math.randomseed(1)
+gCards = initCards()
+local allCards = getRandomCards(52)
+assertEqual(52, #allCards, "deck generation count")
+local seen = {}
+for i = 1, #allCards do
+	local key = allCards[i].suit.."-"..allCards[i].value
+	seen[key] = (seen[key] or 0) + 1
+end
+for _,count in pairs(seen) do
+	assertEqual(1, count, "deck generation unique")
+end
+
+local winBoard = { deck = { cards = {} }, pile = {}, waste = { top = { value = 7 } } }
+winBoard.pile = {
+	{ top = { value = 1 } },
+	{ top = { value = 3 } },
+	{ top = { value = 5 } },
+	{ top = { value = 9 } },
+	{ top = nil },
+	{ top = nil },
+	{ top = nil }
+}
+assertEqual(true, rules:isGameOver(winBoard), "isGameOver no moves and deck empty")
 
 print("tests passed")

@@ -27,7 +27,10 @@ function GameContext.new()
         startedAt = os.time(),
         endedAt = nil
     }
-    self.snapshots = {}
+    self.historySnapshots = {}
+    self.redoSnapshots = {}
+    self.replaySnapshots = {}
+    self.snapshots = self.historySnapshots
     self.replayIndex = 0
     self.replayTimer = 0
     self.replayActive = false
@@ -139,24 +142,37 @@ function GameContext:getMetrics()
     return self.metrics
 end
 
+local function cloneList(list)
+    local out = {}
+    for i = 1, #list do
+        out[i] = list[i]
+    end
+    return out
+end
+
 function GameContext:pushSnapshot(snapshot)
     if not snapshot then return end
-    table.insert(self.snapshots, snapshot)
+    table.insert(self.historySnapshots, snapshot)
+    self.redoSnapshots = {}
     local maxSnapshots = self.config.maxSnapshots or 200
-    while #self.snapshots > maxSnapshots do
-        table.remove(self.snapshots, 1)
+    while #self.historySnapshots > maxSnapshots do
+        table.remove(self.historySnapshots, 1)
     end
 end
 
 function GameContext:clearSnapshots()
-    self.snapshots = {}
+    self.historySnapshots = {}
+    self.redoSnapshots = {}
+    self.replaySnapshots = {}
+    self.snapshots = self.historySnapshots
     self.replayIndex = 0
     self.replayTimer = 0
     self.replayActive = false
 end
 
 function GameContext:startReplay()
-    if #self.snapshots == 0 then return end
+    if #self.historySnapshots == 0 then return end
+    self.replaySnapshots = cloneList(self.historySnapshots)
     self.replayActive = true
     self.replayIndex = 1
     self.replayTimer = 0
@@ -176,11 +192,33 @@ function GameContext:updateReplay(dt)
     local interval = self.config.replayInterval or 0.4
     if self.replayTimer < interval then return nil end
     self.replayTimer = 0
-    local snapshot = self.snapshots[self.replayIndex]
+    local snapshot = self.replaySnapshots[self.replayIndex]
     self.replayIndex = self.replayIndex + 1
-    if self.replayIndex > #self.snapshots then
+    if self.replayIndex > #self.replaySnapshots then
         self.replayActive = false
     end
+    return snapshot
+end
+
+function GameContext:canUndoSnapshot()
+    return #self.historySnapshots > 1
+end
+
+function GameContext:canRedoSnapshot()
+    return #self.redoSnapshots > 0
+end
+
+function GameContext:undoSnapshot()
+    if #self.historySnapshots <= 1 then return nil end
+    local last = table.remove(self.historySnapshots)
+    table.insert(self.redoSnapshots, last)
+    return self.historySnapshots[#self.historySnapshots]
+end
+
+function GameContext:redoSnapshot()
+    if #self.redoSnapshots == 0 then return nil end
+    local snapshot = table.remove(self.redoSnapshots)
+    table.insert(self.historySnapshots, snapshot)
     return snapshot
 end
 

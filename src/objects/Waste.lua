@@ -42,6 +42,16 @@ function Waste:urdo()
 	if love.keyboard.isDown('lctrl') then
 		local score=(GGameContext and GGameContext:getScoreSystem()) or GScoreSystem
 		if love.keyboard.isDown('z') then
+			if GGameContext and GGameContext:canUndoSnapshot() then
+				local snapshot=GGameContext:undoSnapshot()
+				local board=GGameContext:getBoard()
+				if snapshot and board then
+					playURSound()
+					board:applySnapshot(snapshot)
+					if score then score:undoMove() end
+				end
+				return
+			end
 			if #self.undodata>0 then
 
 				playURSound()
@@ -65,6 +75,16 @@ function Waste:urdo()
 			end
 			
 		elseif love.keyboard.isDown('y') then
+			if GGameContext and GGameContext:canRedoSnapshot() then
+				local snapshot=GGameContext:redoSnapshot()
+				local board=GGameContext:getBoard()
+				if snapshot and board then
+					playURSound()
+					board:applySnapshot(snapshot)
+					if score then score:redoMove() end
+				end
+				return
+			end
 			if #self.redodata>0 then
 				
 				playURSound()
