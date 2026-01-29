@@ -66,7 +66,7 @@ assertEqual(33, score:getScore(), "score hint penalty")
 
 math.randomseed(1)
 gCards = initCards()
-local allCards = getRandomCards(52)
+local allCards = getRandomCards(52,false,0,0)
 assertEqual(52, #allCards, "deck generation count")
 local seen = {}
 for i = 1, #allCards do

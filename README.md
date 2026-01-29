@@ -1,6 +1,8 @@
 # Golf Solitaire
 
 [![CI](https://github.com/lab-xjhowx/Golf-Solitaire/actions/workflows/ci.yml/badge.svg)](https://github.com/lab-xjhowx/Golf-Solitaire/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/lab-xjhowx/Golf-Solitaire)](https://github.com/lab-xjhowx/Golf-Solitaire/releases)
 [![Language](https://img.shields.io/badge/language-lua-blue)](https://www.lua.org/)
 
 Golf Solitaire em 2D feito com LÖVE (Love2D). Inclui undo/redo, hints e IA simples. Compatível com LÖVE 11.x.
@@ -93,6 +95,10 @@ No Windows, se o love não estiver no PATH:
 lua tests/rules_score_tests.lua
 ```
 
+## Contribuição
+
+Veja CONTRIBUTING.md para fluxo, padrões e testes.
+
 ## English
 
 Short overview: Golf Solitaire in LÖVE (Love2D) with undo/redo, hints and a simple AI helper. Compatible with LÖVE 11.x.
@@ -129,4 +135,4 @@ Veja o arquivo ROADMAP.md para evolução técnica, features e polimento visual.
 
 ## Licença
 
-Sem licença declarada no repositório.
+MIT. Veja LICENSE.
