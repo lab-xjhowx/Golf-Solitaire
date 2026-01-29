@@ -41,6 +41,16 @@ Este projeto implementa Golf Solitaire com foco em arquitetura modular, UX clara
 
 Detalhes técnicos: docs/ARQUITETURA.md
 
+## Documentação
+
+- [ARQUITETURA.md](docs/ARQUITETURA.md)
+- [REGRAS_DO_JOGO.md](docs/REGRAS_DO_JOGO.md)
+- [NOTAS_PTBR.md](NOTAS_PTBR.md)
+- [ROADMAP.md](ROADMAP.md)
+- [ROADMAP_GOLF_SOLITAIRE.md](ROADMAP_GOLF_SOLITAIRE.md)
+- [auditoria_tecnica_golf_solitaire_love_2_d.md](auditoria_tecnica_golf_solitaire_love_2_d.md)
+- [auditoria_estrategica_roadmap_profissional_golf_solitaire.md](auditoria_estrategica_roadmap_profissional_golf_solitaire.md)
+
 ## Estrutura de pastas
 
 - assets/ — imagens, fontes e áudio
